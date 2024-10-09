@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Supply Chain DApp</title>
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.6.1/dist/web3.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #e7f3ff;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #007bff;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        input {
+            margin: 10px 0;
+            padding: 10px;
+            border: 1px solid #007bff;
+            border-radius: 4px;
+        }
+
+        button {
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 10px; /* Added spacing */
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        #itemList {
+            margin-top: 20px;
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .item {
+            background: #cce5ff;
+            margin: 5px 0;
+            padding: 10px;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Supply Chain DApp</h1>
+    <form id="itemForm">
+        <input type="text" id="itemName" placeholder="Item Name" required>
+        <input type="number" id="itemPrice" placeholder="Item Price" required>
+        <input type="number" id="itemQuantity" placeholder="Item Quantity" required>
+        <button type="submit">Add Item</button>
+    </form>
+    <button id="viewInventory">View Inventory</button>
+    <ul id="itemList"></ul>
+</div>
+
+<script>
+    const contractABI = [
+    {
+      "inputs": [
+        {
+          "internalType": "string",
+          "name": "_name",
+          "type": "string"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_price",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_quantity",
+          "type": "uint256"
+        }
+      ],
+      "name": "createItem",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "itemCount",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "name": "items",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "id",
+          "type": "uint256"
+        },
+        {
+          "internalType": "string",
+          "name": "name",
+          "type": "string"
+        },
+        {
+          "internalType": "uint256",
+          "name": "price",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "quantity",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "createdAt",
+          "type": "uint256"
+        },
+        {
+          "internalType": "address",
+          "name": "owner",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    }
+    ];
+    const contractAddress = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
+
+    const web3 = new Web3("http://localhost:8545");
+    const supplyChainContract = new web3.eth.Contract(contractABI, contractAddress);
+
+    document.getElementById('itemForm').addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const name = document.getElementById('itemName').value;
+        const price = document.getElementById('itemPrice').value;
+        const quantity = document.getElementById('itemQuantity').value;
+        
+        const accounts = await web3.eth.getAccounts();
+        await supplyChainContract.methods.createItem(name, price, quantity).send({ from: accounts[0] });
+
+        document.getElementById('itemName').value = '';
+        document.getElementById('itemPrice').value = '';
+        document.getElementById('itemQuantity').value = '';
+        loadItems();
+    });
+
+    async function loadItems() {
+        const itemCount = await supplyChainContract.methods.itemCount().call();
+        const itemList = document.getElementById('itemList');
+        itemList.innerHTML = '';
+
+        for (let i = 1; i <= itemCount; i++) {
+            const item = await supplyChainContract.methods.items(i).call();
+            const li = document.createElement('li');
+            li.classList.add('item');
+            li.innerHTML = `ID: ${item.id}, Name: ${item.name}, Price: ${item.price}, Quantity: ${item.quantity}, Created At: ${new Date(item.createdAt * 1000).toLocaleString()}`;
+            itemList.appendChild(li);
+        }
+    }
+
+    document.getElementById('viewInventory').addEventListener('click', () => {
+        const newWindow = window.open('', '_blank');
+        newWindow.document.write('<html><head><title>Inventory</title></head><body><h1>Inventory</h1><ul id="newItemList"></ul></body></html>');
+        const newItemList = newWindow.document.getElementById('newItemList');
+
+        loadItems().then(() => {
+            const items = document.querySelectorAll('#itemList .item');
+            items.forEach(item => {
+                const li = newWindow.document.createElement('li');
+                li.innerHTML = item.innerHTML;
+                newItemList.appendChild(li);
+            });
+        });
+    });
+
+    // Load items on page load
+    window.onload = loadItems;
+</script>
+
+</body>
+</html>
