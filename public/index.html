@@ -4,62 +4,24 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Supply Chain DApp</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <script src="https://cdn.jsdelivr.net/npm/web3@1.6.1/dist/web3.min.js"></script>
     <style>
         body {
-            font-family: Arial, sans-serif;
             background-color: #e7f3ff;
-            margin: 0;
-            padding: 20px;
         }
-
         .container {
-            max-width: 600px;
-            margin: auto;
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
         }
-
         h1 {
-            text-align: center;
             color: #007bff;
         }
-
-        form {
-            display: flex;
-            flex-direction: column;
-        }
-
-        input {
-            margin: 10px 0;
-            padding: 10px;
-            border: 1px solid #007bff;
-            border-radius: 4px;
-        }
-
-        button {
-            padding: 10px;
-            background-color: #007bff;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            margin-top: 10px; /* Added spacing */
-        }
-
-        button:hover {
-            background-color: #0056b3;
-        }
-
-        #itemList {
+        .section-title {
             margin-top: 20px;
-            list-style-type: none;
-            padding: 0;
+            margin-bottom: 10px;
+            color: #0056b3;
         }
-
-        .item {
+        .item, .order {
             background: #cce5ff;
             margin: 5px 0;
             padding: 10px;
@@ -70,19 +32,215 @@
 <body>
 
 <div class="container">
-    <h1>Supply Chain DApp</h1>
-    <form id="itemForm">
-        <input type="text" id="itemName" placeholder="Item Name" required>
-        <input type="number" id="itemPrice" placeholder="Item Price" required>
-        <input type="number" id="itemQuantity" placeholder="Item Quantity" required>
-        <button type="submit">Add Item</button>
-    </form>
-    <button id="viewInventory">View Inventory</button>
-    <ul id="itemList"></ul>
+    <h1 class="text-center">Supply Chain DApp</h1>
+
+    <nav class="nav nav-pills flex-column flex-sm-row mb-3">
+        <a class="flex-sm-fill text-sm-center nav-link active" data-toggle="tab" href="#createItem">Create Item</a>
+        <a class="flex-sm-fill text-sm-center nav-link" data-toggle="tab" href="#updateItem">Update Item</a>
+        <a class="flex-sm-fill text-sm-center nav-link" data-toggle="tab" href="#deleteItem">Delete Item</a>
+        <a class="flex-sm-fill text-sm-center nav-link" data-toggle="tab" href="#orderItem">Order Item</a>
+        <a class="flex-sm-fill text-sm-center nav-link" data-toggle="tab" href="#viewOrders">View Orders</a>
+        <a class="flex-sm-fill text-sm-center nav-link" data-toggle="tab" href="#viewInventory">View Inventory</a>
+    </nav>
+
+    <div class="tab-content">
+        <div class="tab-pane fade show active" id="createItem">
+            <h2 class="section-title">Create Item</h2>
+            <form id="itemForm">
+                <div class="form-group">
+                    <input type="text" class="form-control" id="itemName" placeholder="Item Name" required>
+                </div>
+                <div class="form-group">
+                    <input type="number" class="form-control" id="itemPrice" placeholder="Item Price" required>
+                </div>
+                <div class="form-group">
+                    <input type="number" class="form-control" id="itemQuantity" placeholder="Item Quantity" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Add Item</button>
+            </form>
+        </div>
+
+        <div class="tab-pane fade" id="updateItem">
+            <h2 class="section-title">Update Item</h2>
+            <form id="updateItemForm">
+                <div class="form-group">
+                    <input type="number" class="form-control" id="updateItemId" placeholder="Item ID" required>
+                </div>
+                <div class="form-group">
+                    <input type="text" class="form-control" id="updateItemName" placeholder="New Item Name" required>
+                </div>
+                <div class="form-group">
+                    <input type="number" class="form-control" id="updateItemPrice" placeholder="New Item Price" required>
+                </div>
+                <div class="form-group">
+                    <input type="number" class="form-control" id="updateItemQuantity" placeholder="New Item Quantity" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Update Item</button>
+            </form>
+        </div>
+
+        <div class="tab-pane fade" id="deleteItem">
+            <h2 class="section-title">Delete Item</h2>
+            <form id="deleteItemForm">
+                <div class="form-group">
+                    <input type="number" class="form-control" id="deleteItemId" placeholder="Item ID" required>
+                </div>
+                <button type="submit" class="btn btn-danger">Delete Item</button>
+            </form>
+        </div>
+
+        <div class="tab-pane fade" id="orderItem">
+            <h2 class="section-title">Order Item</h2>
+            <form id="orderItemForm">
+                <div class="form-group">
+                    <input type="number" class="form-control" id="orderItemId" placeholder="Item ID" required>
+                </div>
+                <div class="form-group">
+                    <input type="number" class="form-control" id="orderQuantity" placeholder="Quantity" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Order Item</button>
+            </form>
+        </div>
+
+        <div class="tab-pane fade" id="viewOrders">
+            <h2 class="section-title">View Order Details</h2>
+            <form id="viewOrderForm">
+                <div class="form-group">
+                    <input type="number" class="form-control" id="orderId" placeholder="Order ID" required>
+                </div>
+                <button type="submit" class="btn btn-primary">View Order</button>
+            </form>
+            <ul id="orderList"></ul>
+        </div>
+
+        <div class="tab-pane fade" id="viewInventory">
+            <h2 class="section-title">Current Inventory</h2>
+            <ul id="itemList"></ul>
+        </div>
+    </div>
 </div>
 
 <script>
     const contractABI = [
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "id",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "string",
+          "name": "name",
+          "type": "string"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "price",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "quantity",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "owner",
+          "type": "address"
+        }
+      ],
+      "name": "ItemCreated",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "id",
+          "type": "uint256"
+        }
+      ],
+      "name": "ItemDeleted",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "id",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "quantity",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "buyer",
+          "type": "address"
+        }
+      ],
+      "name": "ItemOrdered",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "id",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "string",
+          "name": "name",
+          "type": "string"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "price",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "quantity",
+          "type": "uint256"
+        }
+      ],
+      "name": "ItemUpdated",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "orderId",
+          "type": "uint256"
+        }
+      ],
+      "name": "OrderFulfilled",
+      "type": "event"
+    },
     {
       "inputs": [
         {
@@ -104,6 +262,83 @@
       "name": "createItem",
       "outputs": [],
       "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_id",
+          "type": "uint256"
+        }
+      ],
+      "name": "deleteItem",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_orderId",
+          "type": "uint256"
+        }
+      ],
+      "name": "fulfillOrder",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_orderId",
+          "type": "uint256"
+        }
+      ],
+      "name": "getOrderDetails",
+      "outputs": [
+        {
+          "components": [
+            {
+              "internalType": "uint256",
+              "name": "id",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "itemId",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "quantity",
+              "type": "uint256"
+            },
+            {
+              "internalType": "address",
+              "name": "buyer",
+              "type": "address"
+            },
+            {
+              "internalType": "bool",
+              "name": "fulfilled",
+              "type": "bool"
+            },
+            {
+              "internalType": "uint256",
+              "name": "createdAt",
+              "type": "uint256"
+            }
+          ],
+          "internalType": "struct SupplyChain.Order",
+          "name": "",
+          "type": "tuple"
+        }
+      ],
+      "stateMutability": "view",
       "type": "function"
     },
     {
@@ -162,11 +397,114 @@
       ],
       "stateMutability": "view",
       "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "orderCount",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_id",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_quantity",
+          "type": "uint256"
+        }
+      ],
+      "name": "orderItem",
+      "outputs": [],
+      "stateMutability": "payable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "name": "orders",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "id",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "itemId",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "quantity",
+          "type": "uint256"
+        },
+        {
+          "internalType": "address",
+          "name": "buyer",
+          "type": "address"
+        },
+        {
+          "internalType": "bool",
+          "name": "fulfilled",
+          "type": "bool"
+        },
+        {
+          "internalType": "uint256",
+          "name": "createdAt",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_id",
+          "type": "uint256"
+        },
+        {
+          "internalType": "string",
+          "name": "_name",
+          "type": "string"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_price",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_quantity",
+          "type": "uint256"
+        }
+      ],
+      "name": "updateItem",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
     }
     ];
-    const contractAddress = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
+    const contractAddress = "0x5FbDB2315678afecb367f032d93F642f64180aa3"; // Replace with your deployed contract address
 
-    const web3 = new Web3("http://localhost:8545");
+    const web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"));
     const supplyChainContract = new web3.eth.Contract(contractABI, contractAddress);
 
     document.getElementById('itemForm').addEventListener('submit', async (event) => {
@@ -184,6 +522,60 @@
         loadItems();
     });
 
+    document.getElementById('updateItemForm').addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const id = document.getElementById('updateItemId').value;
+        const name = document.getElementById('updateItemName').value;
+        const price = document.getElementById('updateItemPrice').value;
+        const quantity = document.getElementById('updateItemQuantity').value;
+
+        const accounts = await web3.eth.getAccounts();
+        await supplyChainContract.methods.updateItem(id, name, price, quantity).send({ from: accounts[0] });
+
+        document.getElementById('updateItemId').value = '';
+        document.getElementById('updateItemName').value = '';
+        document.getElementById('updateItemPrice').value = '';
+        document.getElementById('updateItemQuantity').value = '';
+        loadItems();
+    });
+
+    document.getElementById('deleteItemForm').addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const id = document.getElementById('deleteItemId').value;
+
+        const accounts = await web3.eth.getAccounts();
+        await supplyChainContract.methods.deleteItem(id).send({ from: accounts[0] });
+
+        document.getElementById('deleteItemId').value = '';
+        loadItems();
+    });
+
+    document.getElementById('orderItemForm').addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const id = document.getElementById('orderItemId').value;
+        const quantity = document.getElementById('orderQuantity').value;
+
+        const accounts = await web3.eth.getAccounts();
+        const item = await supplyChainContract.methods.items(id).call();
+        await supplyChainContract.methods.orderItem(id, quantity).send({ from: accounts[0], value: item.price * quantity });
+
+        document.getElementById('orderItemId').value = '';
+        document.getElementById('orderQuantity').value = '';
+    });
+
+    document.getElementById('viewOrderForm').addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const orderId = document.getElementById('orderId').value;
+        const order = await supplyChainContract.methods.getOrderDetails(orderId).call();
+        
+        const orderList = document.getElementById('orderList');
+        orderList.innerHTML = '';
+        const li = document.createElement('li');
+        li.classList.add('order');
+        li.innerHTML = `Order ID: ${orderId}, Item ID: ${order.itemId}, Quantity: ${order.quantity}, Total Price: ${order.totalPrice}`;
+        orderList.appendChild(li);
+    });
+
     async function loadItems() {
         const itemCount = await supplyChainContract.methods.itemCount().call();
         const itemList = document.getElementById('itemList');
@@ -198,24 +590,12 @@
         }
     }
 
-    document.getElementById('viewInventory').addEventListener('click', () => {
-        const newWindow = window.open('', '_blank');
-        newWindow.document.write('<html><head><title>Inventory</title></head><body><h1>Inventory</h1><ul id="newItemList"></ul></body></html>');
-        const newItemList = newWindow.document.getElementById('newItemList');
-
-        loadItems().then(() => {
-            const items = document.querySelectorAll('#itemList .item');
-            items.forEach(item => {
-                const li = newWindow.document.createElement('li');
-                li.innerHTML = item.innerHTML;
-                newItemList.appendChild(li);
-            });
-        });
-    });
-
     // Load items on page load
     window.onload = loadItems;
 </script>
 
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>
